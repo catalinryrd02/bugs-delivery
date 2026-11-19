@@ -487,3 +487,78 @@ body:has(#bottomNav) { padding-bottom: calc(110px + env(safe-area-inset-bottom))
     td .btn, td .btn-outline { padding: 8px 10px; font-size: .8rem; margin: 2px 0; }
     .offline-bar { font-size: .72rem; padding: 4px 8px; }
 }
+
+/* Tablets: el menú inferior ya cubre los botones, así la barra superior no se aprieta */
+.nav-right .btn { white-space: nowrap; }
+@media (max-width: 1024px) {
+    .nav-right .btn { display: none; }
+    .navbar { padding: 10px 20px; }
+}
+@media (min-width: 1025px) { .bottom-nav { width: 520px; } }
+
+/* =========================================================
+   PORTADA (index) · tarjeta guinda con logo
+   ========================================================= */
+body.landing {
+    font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: max(20px, env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+    background: linear-gradient(160deg, #FFF3EA 0%, #FCE3E8 45%, #F2A9B7 100%);
+    background-attachment: fixed;
+}
+body.landing * { font-family: inherit; }
+.landing-card {
+    width: 100%; max-width: 460px; margin: auto;
+    background: #fff; border-radius: 32px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(92, 15, 33, .28);
+    border: 1px solid rgba(255,255,255,.8);
+}
+.hero {
+    position: relative; overflow: hidden; text-align: center; color: #fff;
+    padding: 30px 24px 32px;
+    background:
+        radial-gradient(circle at 12% 8%, rgba(228,103,127,.45), transparent 42%),
+        linear-gradient(165deg, #921733 0%, #5C0F21 55%, #2B0710 100%);
+}
+.hero::before, .hero::after {
+    content: ""; position: absolute; border-radius: 50%; border: 1px solid rgba(242,169,183,.28); pointer-events: none;
+}
+.hero::before { width: 300px; height: 300px; top: -150px; right: -120px; }
+.hero::after { width: 260px; height: 260px; bottom: -150px; left: -100px; }
+.hero > * { position: relative; z-index: 1; }
+.hero-kicker { text-transform: uppercase; letter-spacing: .32em; font-size: .72rem; color: #F2C98B; }
+.hero-logo {
+    width: 116px; height: 116px; margin: 18px auto 14px; background: #fff; border-radius: 28px;
+    display: grid; place-items: center; box-shadow: 0 10px 28px rgba(0,0,0,.3);
+}
+.hero-logo img { width: 92px; height: 92px; border-radius: 50%; display: block; }
+.hero h1 { font-size: clamp(2.2rem, 11vw, 3rem); font-weight: 500; letter-spacing: .03em; line-height: 1; }
+.hero-sub { margin-top: 14px; letter-spacing: .36em; font-size: 1rem; color: #F2C98B; padding-left: .36em; }
+.hero-line { width: 96px; height: 3px; margin: 20px auto 16px; background: linear-gradient(90deg, transparent, #F2C98B, transparent); }
+.hero-tag { font-size: 1.05rem; color: #FCE3E8; }
+
+.landing-body { padding: 26px 22px 8px; }
+.landing-body .kicker { text-transform: uppercase; letter-spacing: .16em; font-size: .8rem; color: #921733; font-weight: 500; }
+.landing-body .lead { color: #7A4A56; line-height: 1.55; margin: 10px 0 20px; font-size: 1.02rem; }
+.lbtn {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    width: 100%; min-height: 54px; padding: 14px 16px; margin-bottom: 12px;
+    border-radius: 18px; border: 1px solid #F2A9B7; background: #fff; color: #5C0F21;
+    font-size: 1.05rem; font-weight: 400; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(146,23,51,.08); transition: transform .15s ease, box-shadow .2s ease;
+}
+.lbtn:hover { box-shadow: 0 6px 16px rgba(146,23,51,.18); }
+.lbtn:active { transform: scale(.98); }
+.lbtn:focus-visible { outline: 3px solid #F2A9B7; outline-offset: 2px; }
+.lbtn.primary { background: linear-gradient(135deg, #5C0F21, #921733); color: #fff; border-color: #5C0F21; }
+.install-tip { font-size: .85rem; color: #5C0F21; background: #FCE3E8; border-radius: 12px; padding: 10px 12px; margin: -2px 0 12px; line-height: 1.4; }
+.install-tip[hidden], #installBox[hidden] { display: none; }
+.back-link { background: none; border: none; color: #921733; font-size: .95rem; cursor: pointer; padding: 6px 0; margin-bottom: 6px; }
+.view-title { color: #5C0F21; font-size: 1.5rem; font-weight: 500; }
+.switch-line { text-align: center; color: #7A4A56; font-size: .92rem; margin: 6px 0 10px; }
+.switch-line a { color: #921733; font-weight: 600; }
+.landing-body .form-group label { color: #5C0F21; font-weight: 500; }
+.landing-body .form-group input { border-radius: 14px; padding: 14px; border-color: #F2A9B7; }
+.landing-foot { text-align: center; color: #7A4A56; font-size: .82rem; padding: 14px 0 22px; line-height: 1.6; }
+@media (min-width: 700px) { body.landing { align-items: center; } .landing-card { max-width: 480px; } }

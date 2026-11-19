@@ -101,5 +101,18 @@
 
     <script src="app.js"></script>
     <script src="pwa.js"></script>
+    <script>
+        // Llena la lista de restaurantes desde la base de datos (no toca app.js)
+        fetch('/api/restaurantes').then(function (r) { return r.json(); }).then(function (list) {
+            var sel = document.getElementById('prodRestaurante');
+            if (!sel || !Array.isArray(list) || !list.length) return;
+            sel.innerHTML = '';
+            list.forEach(function (r) {
+                var o = document.createElement('option');
+                o.value = r.id; o.textContent = r.nombre + ' (' + r.zona + ')';
+                sel.appendChild(o);
+            });
+        }).catch(function () {});
+    </script>
 </body>
 </html>

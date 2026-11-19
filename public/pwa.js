@@ -73,23 +73,14 @@
         window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
+    function installHelp() {
+        if (isIOS) return 'En iPhone: toca Compartir y luego "Agregar a pantalla de inicio".';
+        return 'Para instalar: abre el menú ⋮ del navegador y elige "Instalar app" o "Agregar a pantalla principal".';
+    }
     function setInstallUI() {
         const box = document.getElementById('installBox');
         if (!box) return;
-        const btn = document.getElementById('installBtn');
-        const tip = document.getElementById('installTip');
-        if (isStandalone()) { box.hidden = true; return; }
-        box.hidden = false;
-        if (deferredPrompt) {
-            btn.hidden = false;
-            tip.textContent = 'Instálala en tu teléfono y úsala incluso sin internet.';
-        } else if (isIOS) {
-            btn.hidden = true;
-            tip.textContent = 'En iPhone: toca Compartir y luego "Agregar a pantalla de inicio".';
-        } else {
-            btn.hidden = true;
-            tip.textContent = 'Para instalar: menú ⋮ del navegador → "Instalar app" o "Agregar a pantalla principal".';
-        }
+        box.hidden = isStandalone();   // ya instalada: se oculta el botón
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -104,7 +95,11 @@
     });
     document.addEventListener('click', async (e) => {
         if (!e.target.closest || !e.target.closest('#installBtn')) return;
-        if (!deferredPrompt) return;
+        if (!deferredPrompt) {   // el navegador no ofrece instalación directa: mostrar cómo hacerlo
+            const tip = document.getElementById('installTip');
+            if (tip) { tip.textContent = installHelp(); tip.hidden = false; }
+            return;
+        }
         deferredPrompt.prompt();
         try { await deferredPrompt.userChoice; } catch { /* ignorar */ }
         deferredPrompt = null;

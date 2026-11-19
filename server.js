@@ -148,18 +148,87 @@ async function initDatabase() {
             ('Carlos Mendoza (Moto)', 'repartidor@fastbite.com', 'repa123', 'repartidor', '5599887766', 'Motocicleta Italika 150cc'),
             ('Sofía Ramírez', 'cliente@fastbite.com', 'cliente123', 'cliente', '5544332211', NULL)`);
     }
-    const [[{ n: nRest }]] = await db.query('SELECT COUNT(*) AS n FROM restaurantes');
-    if (nRest === 0) {
-        await db.query(`INSERT INTO restaurantes (nombre, categoria, zona, latitud, longitud, tiempo_entrega, calificacion, imagen_url) VALUES
-            ('Burger Kingz Grill', 'Hamburguesas', 'Zona Centro', 19.635000, -99.310000, '20-30 min', 4.9, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500'),
-            ('Tacos El Patrón', 'Mexicana', 'Zona Norte', 19.640000, -99.305000, '15-25 min', 4.8, 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500'),
-            ('Napoli Express Pizza', 'Pizzas', 'Zona Centro', 19.632000, -99.312000, '25-40 min', 4.7, 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500')`);
-        await db.query(`INSERT INTO productos (restaurante_id, nombre, descripcion, precio, imagen_url) VALUES
-            (1, 'Doble Queso Tocino XL', 'Doble carne res a la parrilla, queso cheddar fundido, tocino crujiente y papas.', 145.00, 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400'),
-            (1, 'Combo Crispy Chicken', 'Pechuga empanizada extra crujiente, aderezo chipotle y refresco 600ml.', 125.00, 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400'),
-            (2, 'Orden 5 Tacos al Pastor', 'Con piña, cilantro, cebolla, salsa verde cruda y limones.', 85.00, 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400'),
-            (3, 'Pizza Pepperoni Suprema', 'Pizza grande de 8 rebanadas con doble pepperoni y orilla rellena de queso.', 189.00, 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400')`);
+    await seedCatalog();
+}
+
+// ---------- Catálogo de ejemplo (restaurantes y platillos) ----------
+// Se agrega una sola vez (si aún no existe el restaurante "Pollo Crujiente Express").
+// Busca los restaurantes por nombre, así que no depende de números de id.
+const U = (id, w) => `https://images.unsplash.com/${id}?w=${w}`;
+const CATALOGO = [
+  { nombre: 'Burger Kingz Grill', categoria: 'Hamburguesas', zona: 'Zona Centro', lat: 19.635, lng: -99.310, t: '20-30 min', c: 4.9, img: U('photo-1568901346375-23c9450c58cd', 500), productos: [
+    ['Doble Queso Tocino XL', 'Doble carne res a la parrilla, queso cheddar fundido, tocino crujiente y papas.', 145, U('photo-1553979459-d2229ba7433b', 400)],
+    ['Combo Crispy Chicken', 'Pechuga empanizada extra crujiente, aderezo chipotle y refresco 600ml.', 125, U('photo-1626082927389-6cd097cdc6ec', 400)],
+    ['Hamburguesa Clásica', 'Carne de res, lechuga, jitomate, cebolla y aderezo de la casa.', 99, '/img/burger.svg'],
+    ['Papas Gajo con Queso', 'Papas gajo doradas con salsa de queso cheddar.', 55, '/img/fries.svg'],
+    ['Malteada de Vainilla', 'Malteada cremosa con crema batida.', 69, '/img/drink.svg'] ] },
+  { nombre: 'Tacos El Patrón', categoria: 'Mexicana', zona: 'Zona Norte', lat: 19.640, lng: -99.305, t: '15-25 min', c: 4.8, img: U('photo-1565299585323-38d6b0865b47', 500), productos: [
+    ['Orden 5 Tacos al Pastor', 'Con piña, cilantro, cebolla, salsa verde cruda y limones.', 85, U('photo-1551504734-5ee1c4a1479b', 400)],
+    ['Gringa de Pastor', 'Tortilla de harina con queso y pastor, con piña.', 75, '/img/tacos.svg'],
+    ['Burrito de Asada', 'Tortilla grande con arroz, frijoles, carne asada y queso.', 95, '/img/burrito.svg'],
+    ['Quesadillas (3 pzas)', 'Quesadillas de maíz con queso Oaxaca.', 70, '/img/cheese.svg'],
+    ['Agua de Horchata 1L', 'Agua fresca de horchata con canela.', 35, '/img/drink.svg'] ] },
+  { nombre: 'Napoli Express Pizza', categoria: 'Pizzas', zona: 'Zona Centro', lat: 19.632, lng: -99.312, t: '25-40 min', c: 4.7, img: U('photo-1513104890138-7c749659a591', 500), productos: [
+    ['Pizza Pepperoni Suprema', 'Pizza grande de 8 rebanadas con doble pepperoni y orilla rellena de queso.', 189, U('photo-1628840042765-356cda07504e', 400)],
+    ['Pizza Hawaiana', 'Jamón y piña con mucho queso mozzarella.', 175, '/img/pizza.svg'],
+    ['Pizza Margarita', 'Salsa de tomate, mozzarella y albahaca fresca.', 159, '/img/pizza.svg'],
+    ['Calzone de Jamón y Queso', 'Pizza cerrada rellena, horneada al momento.', 120, '/img/cheese.svg'],
+    ['Pan de Ajo', 'Pan artesanal con mantequilla de ajo y queso.', 59, '/img/bread.svg'] ] },
+  { nombre: 'Pollo Crujiente Express', categoria: 'Pollo', zona: 'Zona Centro', lat: 19.634, lng: -99.308, t: '20-30 min', c: 4.6, img: '/img/chicken.svg', productos: [
+    ['Alitas BBQ (10 pzas)', 'Alitas bañadas en salsa BBQ con dip de ranch.', 149, '/img/chicken.svg'],
+    ['Tiras de Pollo Empanizadas', 'Tiras crujientes con aderezo de miel y mostaza.', 119, '/img/chicken.svg'],
+    ['Combo Familiar 6 piezas', '6 piezas de pollo, papas grandes y 4 refrescos.', 259, '/img/chicken.svg'],
+    ['Papas Fritas Grandes', 'Papas fritas doradas con sal.', 45, '/img/fries.svg'] ] },
+  { nombre: 'Sushi Nori', categoria: 'Sushi', zona: 'Zona Norte', lat: 19.642, lng: -99.307, t: '30-45 min', c: 4.8, img: '/img/sushi.svg', productos: [
+    ['Roll California', '8 piezas con surimi, aguacate y pepino.', 129, '/img/sushi.svg'],
+    ['Roll Philadelphia', '8 piezas con salmón, queso crema y pepino.', 139, '/img/sushi.svg'],
+    ['Nigiri Mixto (8 pzas)', 'Selección de nigiris de salmón, atún y camarón.', 159, '/img/sushi.svg'],
+    ['Ensalada Wakame', 'Alga wakame con ajonjolí y aderezo oriental.', 79, '/img/salad.svg'] ] },
+  { nombre: 'Hot Dogzilla', categoria: 'Hot Dogs', zona: 'Zona Norte', lat: 19.638, lng: -99.304, t: '15-25 min', c: 4.5, img: '/img/hotdog.svg', productos: [
+    ['Hot Dog Jumbo', 'Salchicha jumbo con cebolla, jitomate y aderezos.', 65, '/img/hotdog.svg'],
+    ['Hot Dog con Tocino', 'Envuelto en tocino con queso y jalapeño.', 79, '/img/hotdog.svg'],
+    ['Papas Locas', 'Papas con queso, tocino y salchicha picada.', 69, '/img/fries.svg'] ] },
+  { nombre: 'Dulce Tentación', categoria: 'Postres', zona: 'Zona Centro', lat: 19.633, lng: -99.314, t: '20-35 min', c: 4.9, img: '/img/cake.svg', productos: [
+    ['Pastel de Chocolate (rebanada)', 'Pastel húmedo de chocolate con betún.', 69, '/img/cake.svg'],
+    ['Cheesecake de Fresa', 'Rebanada de cheesecake con salsa de fresa.', 75, '/img/cake.svg'],
+    ['Helado de Vainilla (3 bolas)', 'Tres bolas de helado con galleta.', 59, '/img/icecream.svg'],
+    ['Donas Glaseadas (3 pzas)', 'Donas suaves con glaseado de colores.', 55, '/img/donut.svg'],
+    ['Crepa de Nutella', 'Crepa con Nutella, plátano y fresas.', 79, '/img/pancakes.svg'] ] },
+  { nombre: 'Café & Brunch Bugs', categoria: 'Cafetería', zona: 'Zona Centro', lat: 19.636, lng: -99.311, t: '15-25 min', c: 4.7, img: '/img/coffee.svg', productos: [
+    ['Café Americano', 'Café de grano recién molido.', 35, '/img/coffee.svg'],
+    ['Capuchino', 'Espresso con leche vaporizada y espuma.', 49, '/img/coffee.svg'],
+    ['Sándwich Club', 'Pollo, tocino, lechuga, jitomate y mayonesa en pan tostado.', 89, '/img/sandwich.svg'],
+    ['Hot Cakes (3 pzas)', 'Con mantequilla, miel de maple y fruta.', 79, '/img/pancakes.svg'] ] },
+  { nombre: 'Pasta Mía', categoria: 'Italiana', zona: 'Zona Norte', lat: 19.641, lng: -99.309, t: '25-40 min', c: 4.6, img: '/img/pasta.svg', productos: [
+    ['Spaghetti Boloñesa', 'Spaghetti con salsa de carne y queso parmesano.', 109, '/img/pasta.svg'],
+    ['Fettuccine Alfredo', 'Fettuccine en cremosa salsa Alfredo.', 119, '/img/pasta.svg'],
+    ['Lasaña de Carne', 'Capas de pasta, carne, bechamel y queso gratinado.', 129, '/img/pasta.svg'],
+    ['Ensalada César', 'Lechuga, crotones, parmesano y aderezo César.', 85, '/img/salad.svg'] ] }
+];
+
+async function seedCatalog() {
+    const marker = 'Pollo Crujiente Express';
+    const [[{ n }]] = await db.query('SELECT COUNT(*) AS n FROM restaurantes WHERE nombre = ?', [marker]);
+    if (n > 0) return; // ya se agregó: no vuelve a meter platillos que el admin haya borrado
+    for (const r of CATALOGO) {
+        let [rows] = await db.query('SELECT id FROM restaurantes WHERE nombre = ? LIMIT 1', [r.nombre]);
+        let rid;
+        if (rows.length) rid = rows[0].id;
+        else {
+            const [ins] = await db.query(
+                'INSERT INTO restaurantes (nombre, categoria, zona, latitud, longitud, tiempo_entrega, calificacion, imagen_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [r.nombre, r.categoria, r.zona, r.lat, r.lng, r.t, r.c, r.img]);
+            rid = ins.insertId;
+        }
+        for (const [nombre, desc, precio, img] of r.productos) {
+            const [ex] = await db.query('SELECT id FROM productos WHERE restaurante_id = ? AND nombre = ? LIMIT 1', [rid, nombre]);
+            if (!ex.length) {
+                await db.query('INSERT INTO productos (restaurante_id, nombre, descripcion, precio, imagen_url) VALUES (?, ?, ?, ?, ?)',
+                    [rid, nombre, desc, precio, img]);
+            }
+        }
     }
+    console.log('🍽️  Catálogo de ejemplo agregado');
 }
 
 async function connectWithRetry(attempt = 1) {
@@ -224,6 +293,11 @@ app.post('/api/productos', wrap(async (req, res) => {
 app.delete('/api/productos/:id', wrap(async (req, res) => {
     await db.query('DELETE FROM productos WHERE id = ?', [req.params.id]);
     res.json({ message: 'Producto eliminado' });
+}));
+
+app.get('/api/restaurantes', wrap(async (req, res) => {
+    const [rows] = await db.query('SELECT id, nombre, zona FROM restaurantes ORDER BY nombre');
+    res.json(rows);
 }));
 
 // --- FAVORITOS (me gusta) guardados en la base de datos ---
