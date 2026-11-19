@@ -1,0 +1,24 @@
+{
+  "name": "LOS BUGS DELIVERY",
+  "short_name": "LOS BUGS",
+  "description": "Pide tu comida favorita, incluso sin internet. Delivery LOS BUGS.",
+  "id": "/index.html",
+  "start_url": "/index.html?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "background_color": "#FFFFFF",
+  "theme_color": "#921733",
+  "categories": ["food", "shopping"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Pedir comida", "short_name": "Pedir", "url": "/cliente.html", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

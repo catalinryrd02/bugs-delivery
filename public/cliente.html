@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOS BUGS | Pedir Comida</title>
+    <meta name="theme-color" content="#921733">
+    <meta name="description" content="LOS BUGS DELIVERY - tu comida favorita, también sin internet">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icons/favicon-48.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="LOS BUGS">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Estilos de Leaflet (Mapa gratuito) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body onload="initCliente()">
+    <nav class="navbar">
+        <a class="brand" href="#" aria-label="LOS BUGS DELIVERY">
+            <img src="/icons/logo.png" alt="Logo LOS BUGS" width="44" height="44">
+            <span class="brand-name">LOS BUGS<small>DELIVERY</small></span>
+        </a>
+        <div class="nav-right">
+            <span class="user-welcome" id="welcomeUser">Bienvenido</span>
+            <button class="btn btn-outline" onclick="toggleFavoritosFilter()">❤️ Favoritos (<span id="favCount">0</span>)</button>
+            <button class="btn btn-primary" onclick="toggleCart()">🛒 Carrito (<span id="cartCount">0</span>)</button>
+            <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ZONA Y GEOLOCALIZACIÓN -->
+        <div class="location-banner">
+            <div>
+                <h3>📍 Tu ubicación actual: <span id="currentZoneText" style="color:var(--primary);">Detectando zona...</span></h3>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Mostrando restaurantes y platillos disponibles cerca de ti</p>
+            </div>
+            <div class="zone-controls">
+                <button class="btn btn-dark" onclick="detectarUbicacionGPS()">📡 Usar mi GPS</button>
+                <select id="zoneSelector" onchange="filtrarPorZona(this.value)" style="padding:10px; border-radius:8px; border:1px solid #ccc;">
+                    <option value="Todas">Todas las Zonas</option>
+                    <option value="Zona Centro">Zona Centro</option>
+                    <option value="Zona Norte">Zona Norte</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- MAPA DE RESTAURANTES EN TU ZONA -->
+        <div id="clientMap" class="map-box"></div>
+
+        <!-- CATÁLOGO DE COMIDA -->
+        <h2 id="secCatalogo" style="margin-bottom:15px;">🍔 Restaurantes y Platillos Disponibles</h2>
+        <div class="grid-cards" id="productosGrid"></div>
+
+        <!-- MIS PEDIDOS ACTIVOS -->
+        <div class="panel-section" id="secPedidos" style="margin-top:35px;">
+            <h3>📦 Mis Pedidos Recientes y Estado en Vivo</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th># Pedido</th>
+                        <th>Dirección</th>
+                        <th>Total</th>
+                        <th>Repartidor</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="misPedidosTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CARRITO LATERAL -->
+    <div class="cart-drawer" id="cartDrawer">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>🛒 Tu Pedido</h2>
+            <button class="btn btn-outline" onclick="toggleCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cartItemsList"></div>
+        <div>
+            <div class="form-group">
+                <label>Dirección exacta de entrega</label>
+                <input type="text" id="deliveryAddress" placeholder="Calle, número, colonia...">
+            </div>
+            <div class="form-group">
+                <label>Método de Pago</label>
+                <select id="paymentMethod">
+                    <option value="Efectivo">💵 Efectivo contra entrega</option>
+                    <option value="Tarjeta">💳 Tarjeta de Débito/Crédito</option>
+                </select>
+            </div>
+            <h3 style="margin-bottom:12px;">Total a pagar: $<span id="cartTotal">0.00</span> MXN</h3>
+            <button class="btn btn-primary" style="width:100%;" onclick="realizarPedido()">Confirmar y Pedir Ahora</button>
+        </div>
+    </div>
+
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+    <nav class="bottom-nav" id="bottomNav" aria-label="Navegación principal">
+        <button type="button" class="bn-item active" data-target="top" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span class="bn-label">Inicio</span></button>
+        <button type="button" class="bn-item" data-role="fav" data-keep="true" onclick="toggleFavoritosFilter()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg><span class="bn-label">Favoritos</span><span class="bn-badge" id="bnFavBadge" hidden>0</span></button>
+        <button type="button" class="bn-item" data-role="cart" data-keep="true" onclick="toggleCart()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H6"/></svg><span class="bn-label">Carrito</span><span class="bn-badge" id="bnCartBadge" hidden>0</span></button>
+        <button type="button" class="bn-item" data-target="secPedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span class="bn-label">Pedidos</span></button>
+        <button type="button" class="bn-item" data-keep="true" onclick="logout()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg><span class="bn-label">Salir</span></button>
+    </nav>
+
+    <!-- Script de Leaflet (Mapa gratuito) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+    <script src="pwa.js"></script>
+</body>
+</html>

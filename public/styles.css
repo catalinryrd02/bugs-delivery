@@ -1,0 +1,489 @@
+:root {
+    /* Paleta Granate (guinda) + rosa del logo LOS BUGS */
+    --primary: #921733;
+    --primary-dark: #5C0F21;
+    --accent: #C82A4C;
+    --rose: #E4677F;
+    --logo-pink: #E283C7;
+    --logo-pink-soft: #FFDDF5;
+    --dark: #2B0710;
+    --gray-bg: #FCE3E8;
+    --page-bg: #FFF6F8;
+    --gray-border: #F2A9B7;
+    --text-main: #2B0710;
+    --text-muted: #7A4A56;
+    --danger: #C82A4C;
+    --warning: #FFC043;
+    --shadow: 0 4px 20px rgba(146, 23, 51, 0.12);
+    --radius: 14px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--page-bg);
+    color: var(--text-main);
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #FFFFFF;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 12px rgba(146,23,51,0.12);
+    border-bottom: 2px solid var(--logo-pink-soft);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -0.5px;
+}
+
+.logo span {
+    color: var(--primary);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.user-welcome {
+    font-weight: 600;
+    background: var(--gray-bg);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* BOTONES */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-dark {
+    background: var(--dark);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--gray-border);
+    color: var(--text-main);
+}
+
+.btn-outline:hover {
+    background: var(--gray-bg);
+}
+
+/* LOGIN & REGISTRO */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #2B0710 0%, #5C0F21 55%, #921733 100%);
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+.auth-tabs {
+    display: flex;
+    margin: 20px 0;
+    border-bottom: 2px solid var(--gray-border);
+}
+
+.auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.auth-tab.active {
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.demo-credentials {
+    margin-top: 20px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #166534;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.container {
+    max-width: 1250px;
+    margin: 25px auto;
+    padding: 0 20px;
+}
+
+/* BARRA DE UBICACIÓN Y FILTROS */
+.location-banner {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.zone-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* GRID DE PRODUCTOS */
+.grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.like-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: white;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.like-btn.liked {
+    color: var(--danger);
+}
+
+.card-body {
+    padding: 16px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--gray-bg);
+    margin-bottom: 8px;
+}
+
+.card-title {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+}
+
+.card-desc {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--gray-border);
+    padding-top: 12px;
+}
+
+.price {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+/* DRAWER DEL CARRITO */
+.cart-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+    z-index: 200;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+}
+
+.cart-drawer.open {
+    right: 0;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    margin: 15px 0;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-border);
+}
+
+/* MAPAS Y TABLAS ADMIN / REPARTIDOR */
+.map-box {
+    width: 100%;
+    height: 320px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    border: 1px solid var(--gray-border);
+}
+
+.panel-section {
+    background: white;
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid var(--gray-border);
+}
+
+th {
+    background: var(--gray-bg);
+    font-weight: 700;
+}
+
+.status-pill {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-pendiente { background: #FCE3E8; color: #921733; }
+.status-preparando { background: #FFDDF5; color: #5C0F21; }
+.status-en_camino { background: #DBEAFE; color: #1E40AF; }
+.status-entregado { background: #D1FAE5; color: #065F46; }
+/* =========================================================
+   LOS BUGS · MARCA, PWA Y BARRA DE NAVEGACIÓN INFERIOR
+   ========================================================= */
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--dark); }
+.brand img { width: 44px; height: 44px; border-radius: 50%; display: block; }
+.brand-name { font-weight: 800; letter-spacing: -0.3px; font-size: 1.2rem; color: var(--primary); line-height: 1; }
+.brand-name small { display: block; font-size: 0.62rem; letter-spacing: 2px; color: var(--text-muted); font-weight: 700; margin-top: 3px; }
+
+.auth-logo { text-align: center; }
+.auth-logo img { width: 120px; height: 120px; border-radius: 50%; box-shadow: 0 6px 20px rgba(146,23,51,.25); }
+.auth-logo h1 { color: var(--primary); font-size: 1.5rem; margin-top: 8px; letter-spacing: -0.3px; }
+.auth-tab.active { color: var(--primary); border-bottom-color: var(--accent); }
+.form-group input:focus, .form-group select:focus, input:focus, select:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--logo-pink-soft);
+}
+input, select { font-size: 1rem; }
+.form-group input, .form-group select { background: #fff; color: var(--text-main); }
+.btn-primary { background: var(--primary); }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-dark { background: var(--dark); }
+.btn-outline { border-color: var(--gray-border); color: var(--primary); }
+.btn-outline:hover { background: var(--gray-bg); }
+.badge { background: var(--logo-pink-soft); color: var(--primary-dark); }
+.price { color: var(--primary); }
+th { background: var(--gray-bg); color: var(--primary-dark); }
+.like-btn.liked { color: var(--accent); }
+
+/* Cajita de instalación (pantalla de login) */
+.install-box { margin-top: 18px; padding: 14px; border-radius: 12px; background: var(--logo-pink-soft); border: 1px dashed var(--logo-pink); text-align: center; }
+.install-box[hidden], .install-box [hidden] { display: none !important; }
+.install-box p { font-size: .85rem; color: var(--primary-dark); margin-bottom: 8px; }
+.install-box .btn { width: 100%; }
+
+/* Avisos PWA */
+.offline-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    background: var(--dark); color: #fff; text-align: center;
+    font-size: .8rem; font-weight: 700; padding: 6px 10px;
+    transform: translateY(-100%); transition: transform .25s ease;
+}
+.offline-bar.show { transform: translateY(0); }
+.pwa-toast {
+    position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom));
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    z-index: 600; max-width: min(92vw, 420px);
+    background: var(--dark); color: #fff; padding: 12px 18px;
+    border-radius: 14px; font-size: .88rem; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3); transition: all .25s ease;
+}
+.pwa-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* BARRA DE NAVEGACIÓN INFERIOR (estilo dock flotante con píldora activa) */
+body:has(#bottomNav) { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+.bottom-nav {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: min(94vw, 560px); z-index: 150;
+    display: flex; justify-content: space-between; align-items: center; gap: 2px;
+    padding: 8px 8px;
+    background: rgba(255,255,255,.96);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid var(--logo-pink-soft);
+    border-radius: 28px;
+    box-shadow: 0 10px 30px rgba(92, 15, 33, .28);
+}
+.bn-item {
+    position: relative; flex: 1; min-width: 0; min-height: 52px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    background: transparent; border: none; border-radius: 20px;
+    color: #7A4A56; font-size: .68rem; font-weight: 600; cursor: pointer;
+    padding: 6px 2px; transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+.bn-item svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bn-item span.bn-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.bn-item:active { transform: scale(.94); }
+.bn-item.active { background: var(--gray-bg); color: var(--primary); font-weight: 800; }
+.bn-item.active svg { stroke-width: 2.2; }
+.bn-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bn-badge {
+    position: absolute; top: 2px; left: 50%; margin-left: 4px;
+    min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+    background: var(--accent); color: #fff; font-size: .65rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+}
+.bn-badge[hidden] { display: none; }
+
+.cart-drawer { z-index: 200; height: 100dvh; }
+.panel-section { overflow-x: auto; scroll-margin-top: 80px; }
+.container > .panel-section, #productosGrid { scroll-margin-top: 80px; }
+
+/* Móvil: el menú inferior reemplaza los botones de arriba */
+@media (max-width: 768px) {
+    .navbar { padding: 10px 14px; }
+    .nav-right .btn { display: none; }
+    .user-welcome { font-size: .78rem; padding: 6px 10px; max-width: 52vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .container { padding: 0 14px; margin-top: 16px; }
+    .auth-card { padding: 28px 22px; }
+    .grid-cards { grid-template-columns: 1fr; gap: 18px; }
+    .location-banner { padding: 16px; }
+    th, td { padding: 10px 8px; font-size: .85rem; }
+}
+@media (min-width: 769px) {
+    /* En escritorio los botones de arriba siguen visibles; la barra inferior se ve más compacta */
+    .bottom-nav { width: 520px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Formularios del panel admin (inputs sueltos) */
+.panel-section form input, .panel-section form select {
+    width: 100%; padding: 12px; border: 1px solid var(--gray-border);
+    border-radius: 10px; background: #fff; color: var(--text-main);
+}
+@media (max-width: 768px) {
+    td .btn, td .btn-outline { padding: 8px 10px; font-size: .8rem; margin: 2px 0; }
+    .offline-bar { font-size: .72rem; padding: 4px 8px; }
+}
