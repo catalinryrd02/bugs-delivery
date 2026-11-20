@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>LOS BUGS | Pedir Comida</title>
-    <meta name="theme-color" content="#921733">
+    <meta name="theme-color" content="#7B2857">
     <meta name="description" content="LOS BUGS DELIVERY - tu comida favorita, también sin internet">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/icons/favicon-48.png">
@@ -13,103 +13,187 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="LOS BUGS">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="cliente.css">
     <!-- Estilos de Leaflet (Mapa gratuito) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
-<body onload="initCliente()">
+<body class="page-cliente view-home" onload="initCliente()">
     <nav class="navbar">
-        <a class="brand" href="#" aria-label="LOS BUGS DELIVERY">
+        <a class="brand" href="#inicio" aria-label="LOS BUGS DELIVERY">
             <img src="/icons/logo.png" alt="Logo LOS BUGS" width="44" height="44">
             <span class="brand-name">LOS BUGS<small>DELIVERY</small></span>
         </a>
         <div class="nav-right">
             <span class="user-welcome" id="welcomeUser">Bienvenido</span>
+            <!-- Estos botones los usa app.js (contadores); el menú de abajo hace su trabajo -->
             <button class="btn btn-outline" onclick="toggleFavoritosFilter()">❤️ Favoritos (<span id="favCount">0</span>)</button>
             <button class="btn btn-primary" onclick="toggleCart()">🛒 Carrito (<span id="cartCount">0</span>)</button>
             <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
         </div>
     </nav>
 
-    <div class="container">
-        <!-- ZONA Y GEOLOCALIZACIÓN -->
-        <div class="location-banner">
-            <div>
-                <h3>📍 Tu ubicación actual: <span id="currentZoneText" style="color:var(--primary);">Detectando zona...</span></h3>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Mostrando restaurantes y platillos disponibles cerca de ti</p>
+    <main class="container">
+
+        <!-- ================= INICIO ================= -->
+        <section id="viewHome" class="view">
+            <header class="hero-home">
+                <p class="hero-hello">Hola, <span id="heroName">bienvenido</span> 👋</p>
+                <h1>¿Qué se te antoja hoy?</h1>
+                <div class="perks">
+                    <span>🛵 Entrega rápida</span>
+                    <span>💳 Pago seguro</span>
+                    <span>📴 Funciona sin internet</span>
+                </div>
+            </header>
+
+            <!-- ZONA Y GEOLOCALIZACIÓN -->
+            <div class="loc-card">
+                <div class="loc-pin" aria-hidden="true">📍</div>
+                <div class="loc-text">
+                    <small>Tu ubicación actual</small>
+                    <strong id="currentZoneText">Detectando zona...</strong>
+                </div>
+                <div class="zone-controls">
+                    <select id="zoneSelector" onchange="filtrarPorZona(this.value)" aria-label="Zona">
+                        <option value="Todas">Todas las zonas</option>
+                        <option value="Zona Centro">Zona Centro</option>
+                        <option value="Zona Norte">Zona Norte</option>
+                    </select>
+                    <button class="btn btn-dark" onclick="detectarUbicacionGPS()">📡 Usar mi GPS</button>
+                </div>
             </div>
-            <div class="zone-controls">
-                <button class="btn btn-dark" onclick="detectarUbicacionGPS()">📡 Usar mi GPS</button>
-                <select id="zoneSelector" onchange="filtrarPorZona(this.value)" style="padding:10px; border-radius:8px; border:1px solid #ccc;">
-                    <option value="Todas">Todas las Zonas</option>
-                    <option value="Zona Centro">Zona Centro</option>
-                    <option value="Zona Norte">Zona Norte</option>
-                </select>
+
+            <!-- MAPA DE RESTAURANTES EN TU ZONA -->
+            <div class="map-wrap">
+                <div id="clientMap" class="map-box"></div>
+                <span class="map-chip" id="mapChip">🍽️ Restaurantes cerca de ti</span>
+                <button type="button" class="map-fab" id="mapLocate" aria-label="Centrar en mi ubicación" onclick="detectarUbicacionGPS()">🎯</button>
             </div>
-        </div>
 
-        <!-- MAPA DE RESTAURANTES EN TU ZONA -->
-        <div id="clientMap" class="map-box"></div>
-
-        <!-- CATÁLOGO DE COMIDA -->
-        <h2 id="secCatalogo" style="margin-bottom:15px;">🍔 Restaurantes y Platillos Disponibles</h2>
-        <div class="grid-cards" id="productosGrid"></div>
-
-        <!-- MIS PEDIDOS ACTIVOS -->
-        <div class="panel-section" id="secPedidos" style="margin-top:35px;">
-            <h3>📦 Mis Pedidos Recientes y Estado en Vivo</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th># Pedido</th>
-                        <th>Dirección</th>
-                        <th>Total</th>
-                        <th>Repartidor</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="misPedidosTable"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- CARRITO LATERAL -->
-    <div class="cart-drawer" id="cartDrawer">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>🛒 Tu Pedido</h2>
-            <button class="btn btn-outline" onclick="toggleCart()">✕</button>
-        </div>
-        <div class="cart-items" id="cartItemsList"></div>
-        <div>
-            <div class="form-group">
-                <label>Dirección exacta de entrega</label>
-                <input type="text" id="deliveryAddress" placeholder="Calle, número, colonia...">
+            <!-- BUSCADOR Y FILTROS -->
+            <div class="search-row">
+                <span aria-hidden="true">🔎</span>
+                <input id="searchBox" type="search" placeholder="Busca un platillo o restaurante" autocomplete="off">
             </div>
-            <div class="form-group">
-                <label>Método de Pago</label>
-                <select id="paymentMethod">
+            <div class="chips" id="restChips" aria-label="Restaurantes"></div>
+
+            <!-- CATÁLOGO DE COMIDA -->
+            <h2 class="section-title" id="secCatalogo">🍔 Restaurantes y platillos</h2>
+            <div class="grid-cards" id="productosGrid"></div>
+            <p class="no-results" id="noResults" hidden>No encontramos platillos con ese filtro. Prueba con otra búsqueda.</p>
+        </section>
+
+        <!-- ================= PEDIDOS ================= -->
+        <section id="viewPedidos" class="view" hidden>
+            <header class="view-head">
+                <h2>📦 Mis pedidos</h2>
+                <p>Estado en vivo y pagos de tus pedidos recientes</p>
+            </header>
+            <div id="pedidosList" class="orders"></div>
+            <div class="empty-state" id="pedidosEmpty" hidden>
+                <div class="empty-emoji">🛍️</div>
+                <h3>Aún no tienes pedidos</h3>
+                <p>Cuando hagas tu primer pedido aparecerá aquí.</p>
+                <button type="button" class="btn btn-primary" data-view="home">Explorar el menú</button>
+            </div>
+            <!-- Tabla original: app.js la llena y mis tarjetas se actualizan con ella -->
+            <table class="legacy-table" aria-hidden="true"><tbody id="misPedidosTable"></tbody></table>
+        </section>
+
+        <!-- ================= PERFIL ================= -->
+        <section id="viewPerfil" class="view" hidden>
+            <header class="profile-card">
+                <div class="avatar" id="perfilAvatar">LB</div>
+                <h2 id="perfilNombre">Cliente</h2>
+                <p id="perfilEmail">correo@ejemplo.com</p>
+            </header>
+            <div class="stats">
+                <div><strong id="statPedidos">0</strong><span>Pedidos</span></div>
+                <div><strong id="statFavs">0</strong><span>Favoritos</span></div>
+                <div><strong id="statGasto">$0</strong><span>Gastado</span></div>
+            </div>
+            <div class="info-card">
+                <div class="info-row"><span>👤 Nombre</span><b id="perfilNombre2">—</b></div>
+                <div class="info-row"><span>✉️ Correo</span><b id="perfilEmail2">—</b></div>
+                <div class="info-row"><span>📞 Teléfono</span><b id="perfilTel">—</b></div>
+                <div class="info-row"><span>💳 Pagos</span><b>Mercado Pago o efectivo</b></div>
+            </div>
+            <div id="installBox" class="install-card" hidden>
+                <button type="button" class="btn btn-primary" id="installBtn">📲 Instalar LOS BUGS DELIVERY</button>
+                <p class="install-tip" id="installTip" hidden></p>
+            </div>
+            <button type="button" class="btn btn-logout" onclick="logout()">Cerrar sesión</button>
+            <p class="profile-foot">LOS BUGS DELIVERY · Tu antojo, hasta tu puerta.</p>
+        </section>
+    </main>
+
+    <!-- ================= CARRITO (pantalla completa) ================= -->
+    <div class="cart-drawer" id="cartDrawer" aria-label="Carrito">
+        <div class="cart-page">
+            <header class="cart-head">
+                <button type="button" class="icon-btn" onclick="toggleCart()" aria-label="Volver">←</button>
+                <div>
+                    <h2>Tu carrito</h2>
+                    <p>Revisa tu pedido antes de pagar</p>
+                </div>
+            </header>
+
+            <div class="cart-items" id="cartItemsList"></div>
+
+            <div class="empty-state" id="cartEmpty" hidden>
+                <div class="empty-emoji">🛒</div>
+                <h3>Tu carrito está vacío</h3>
+                <p>Agrega tus platillos favoritos y vuelve aquí.</p>
+                <button type="button" class="btn btn-primary" data-view="home">Ver el menú</button>
+            </div>
+
+            <div class="cart-checkout" id="cartCheckout">
+                <div class="form-group">
+                    <label for="deliveryAddress">📍 Dirección exacta de entrega</label>
+                    <input type="text" id="deliveryAddress" placeholder="Calle, número, colonia..." autocomplete="street-address">
+                </div>
+
+                <p class="pay-label">Método de pago</p>
+                <select id="paymentMethod" class="pay-select" aria-hidden="true" tabindex="-1">
                     <option value="Efectivo">💵 Efectivo contra entrega</option>
-                    <option value="Tarjeta">💳 Tarjeta de Débito/Crédito</option>
+                    <option value="Tarjeta">💳 Tarjeta de Débito/Crédito (Mercado Pago)</option>
                 </select>
+                <div class="pay-options" role="radiogroup" aria-label="Método de pago">
+                    <button type="button" class="pay-opt active" role="radio" aria-checked="true" data-pay="Efectivo">
+                        <span class="pay-emoji">💵</span><b>Efectivo</b><small>Pagas al recibir</small>
+                    </button>
+                    <button type="button" class="pay-opt" role="radio" aria-checked="false" data-pay="Tarjeta">
+                        <span class="pay-emoji">💳</span><b>Tarjeta</b><small>Con Mercado Pago</small>
+                    </button>
+                </div>
+                <p class="pay-note" id="payNote">Pagas en efectivo cuando llegue tu pedido. Te enviamos la confirmación a tu correo.</p>
+
+                <div class="total-box">
+                    <span>Total a pagar</span>
+                    <strong>$<span id="cartTotal">0.00</span> <small>MXN</small></strong>
+                </div>
+                <button type="button" class="btn btn-primary btn-cta" id="btnPedir" onclick="realizarPedido()">Confirmar y pedir ahora</button>
             </div>
-            <h3 style="margin-bottom:12px;">Total a pagar: $<span id="cartTotal">0.00</span> MXN</h3>
-            <button class="btn btn-primary" style="width:100%;" onclick="realizarPedido()">Confirmar y Pedir Ahora</button>
         </div>
     </div>
-
 
     <!-- BARRA DE NAVEGACIÓN INFERIOR -->
-    <nav class="bottom-nav" id="bottomNav" aria-label="Navegación principal">
-        <button type="button" class="bn-item active" data-target="top" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span class="bn-label">Inicio</span></button>
-        <button type="button" class="bn-item" data-role="fav" data-keep="true" onclick="toggleFavoritosFilter()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg><span class="bn-label">Favoritos</span><span class="bn-badge" id="bnFavBadge" hidden>0</span></button>
-        <button type="button" class="bn-item" data-role="cart" data-keep="true" onclick="toggleCart()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H6"/></svg><span class="bn-label">Carrito</span><span class="bn-badge" id="bnCartBadge" hidden>0</span></button>
-        <button type="button" class="bn-item" data-target="secPedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span class="bn-label">Pedidos</span></button>
-        <button type="button" class="bn-item" data-keep="true" onclick="logout()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg><span class="bn-label">Salir</span></button>
+    <nav class="bottom-nav" id="bottomNav" data-managed="true" aria-label="Navegación principal">
+        <button type="button" class="bn-item active" data-view="home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span class="bn-label">Inicio</span></button>
+        <button type="button" class="bn-item" data-view="favs" data-role="fav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg><span class="bn-label">Favoritos</span><span class="bn-badge" id="bnFavBadge" hidden>0</span></button>
+        <button type="button" class="bn-item" data-view="cart" data-role="cart"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H6"/></svg><span class="bn-label">Carrito</span><span class="bn-badge" id="bnCartBadge" hidden>0</span></button>
+        <button type="button" class="bn-item" data-view="pedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span class="bn-label">Pedidos</span></button>
+        <button type="button" class="bn-item" data-view="perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span class="bn-label">Perfil</span></button>
     </nav>
 
     <!-- Script de Leaflet (Mapa gratuito) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
     <script src="pwa.js"></script>
+    <script src="cliente-ui.js"></script>
 </body>
 </html>

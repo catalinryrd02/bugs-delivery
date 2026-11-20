@@ -3,7 +3,7 @@
    - API GET: red primero, caché como respaldo
    - Imágenes y mapas: caché con actualización
    Sube CACHE_VERSION cada vez que cambies archivos para forzar actualización. */
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v6';
 const SHELL_CACHE = 'losbugs-shell-' + CACHE_VERSION;
 const API_CACHE = 'losbugs-api-' + CACHE_VERSION;
 const IMG_CACHE = 'losbugs-img-' + CACHE_VERSION;
@@ -12,7 +12,7 @@ const CURRENT = [SHELL_CACHE, API_CACHE, IMG_CACHE, TILE_CACHE];
 
 const SHELL = [
   '/', '/index.html', '/cliente.html', '/admin.html', '/repartidor.html', '/offline.html',
-  '/styles.css', '/app.js', '/pwa.js', '/manifest.json',
+  '/styles.css', '/cliente.css', '/app.js', '/pwa.js', '/cliente-ui.js', '/pago.html', '/manifest.json',
   '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-192.png',
   '/icons/maskable-512.png', '/icons/apple-touch-icon.png', '/icons/favicon-48.png', '/icons/logo.png',
   '/img/bread.svg', '/img/burger.svg', '/img/burrito.svg', '/img/cake.svg', '/img/cheese.svg', '/img/chicken.svg', '/img/coffee.svg', '/img/donut.svg', '/img/drink.svg', '/img/fries.svg', '/img/hotdog.svg', '/img/icecream.svg', '/img/pancakes.svg', '/img/pasta.svg', '/img/pizza.svg', '/img/salad.svg', '/img/sandwich.svg', '/img/sushi.svg', '/img/tacos.svg'
@@ -30,8 +30,8 @@ const EXTERNAL = [
 
 const PLACEHOLDER_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">' +
-  '<rect width="400" height="260" fill="#FCE3E8"/><circle cx="200" cy="120" r="46" fill="#F2A9B7"/>' +
-  '<text x="200" y="215" font-family="sans-serif" font-size="20" font-weight="700" text-anchor="middle" fill="#921733">LOS BUGS</text></svg>';
+  '<rect width="400" height="260" fill="#FBE0EC"/><circle cx="200" cy="120" r="46" fill="#F3ADC9"/>' +
+  '<text x="200" y="215" font-family="sans-serif" font-size="20" font-weight="700" text-anchor="middle" fill="#7B2857">LOS BUGS</text></svg>';
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -94,6 +94,9 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return; // POST/PUT/DELETE los maneja pwa.js (cola offline)
   const url = new URL(req.url);
+
+  // Pagos: siempre directo a la red (nunca desde caché)
+  if (url.origin === self.location.origin && (url.pathname.startsWith('/api/pagos/') || /^\/api\/pedidos\/\d+\/pago$/.test(url.pathname))) return;
 
   // API propia
   if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) {

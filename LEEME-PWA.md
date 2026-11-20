@@ -53,3 +53,18 @@ admin@fastbite.com / admin123 · repartidor@fastbite.com / repa123 · cliente@fa
 
 ## Si cambias archivos
 Sube el número de `CACHE_VERSION` en `public/sw.js` (v1 → v2) para que los teléfonos se actualicen.
+
+---
+## Pagos con Mercado Pago y correos de confirmación
+
+Variables en Render → Environment:
+- MP_ACCESS_TOKEN = tu Access Token (Mercado Pago Developers → tu aplicación → Credenciales). Con credenciales de prueba (TEST-...) puedes probar con tarjetas de prueba.
+- PUBLIC_URL = https://bugs-delivery.onrender.com
+- MP_WEBHOOK_SECRET = (opcional) clave secreta de Webhooks.
+- BREVO_API_KEY = API key de Brevo (brevo.com, gratis) y MAIL_FROM = correo remitente verificado en Brevo. MAIL_FROM_NAME (opcional).
+- Si Brevo bloquea la IP: Brevo → Seguridad → Authorized IPs → desactivar el bloqueo.
+- En Mercado Pago configura el webhook: https://bugs-delivery.onrender.com/api/mp/webhook (evento Pagos).
+
+Funcionamiento: efectivo → correo al instante; tarjeta → redirige a Mercado Pago y el correo llega cuando el pago se aprueba. Los pedidos con tarjeta sin pagar no los ven admin ni repartidor.
+
+Para publicar: git add . ; git commit -m "Mercado Pago, correos y nueva interfaz" ; git push  (Render redeploya solo).

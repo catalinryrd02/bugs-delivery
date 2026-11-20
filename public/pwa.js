@@ -144,7 +144,7 @@
         if (!isApi(url) || !isMutation(method)) return nativeFetch(input, init);
 
         const path = new URL(url, location.origin).pathname;
-        const isAuth = path === '/api/login' || path === '/api/register';
+        const isAuth = path === '/api/login' || path === '/api/register' || path.startsWith('/api/pagos/');
 
         // --- Login: guarda un acceso local para poder entrar sin internet ---
         if (path === '/api/login') {
@@ -325,6 +325,7 @@
 
         items.forEach((item) => {
             item.addEventListener('click', () => {
+                if (nav.dataset.managed === 'true') return; // la página maneja su propio menú (cliente-ui.js)
                 const target = item.dataset.target;
                 if (target === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
                 else if (target) {
@@ -372,6 +373,7 @@
         const favItem = nav.querySelector('[data-role="fav"]');
         if (favItem) {
             favItem.addEventListener('click', () => {
+                if (nav.dataset.managed === 'true') return;
                 setTimeout(() => {
                     const on = typeof soloFavoritos !== 'undefined' && soloFavoritos;
                     favItem.classList.toggle('active', on);
@@ -384,6 +386,7 @@
         const cartItem = nav.querySelector('[data-role="cart"]');
         if (cartItem) {
             cartItem.addEventListener('click', () => {
+                if (nav.dataset.managed === 'true') return;
                 const open = document.getElementById('cartDrawer');
                 cartItem.classList.toggle('active', !!(open && open.classList.contains('open')));
             });

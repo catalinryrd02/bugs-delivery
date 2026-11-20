@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Resultado del pago | LOS BUGS</title>
+    <meta name="theme-color" content="#3D1031">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icons/favicon-48.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="landing">
+    <main class="landing-card">
+        <header class="hero" style="padding:22px 20px 24px;">
+            <div class="hero-logo" style="width:84px;height:84px;margin:0 auto 10px;border-radius:22px;"><img src="/icons/logo.png" alt="LOS BUGS" width="66" height="66" style="width:66px;height:66px;"></div>
+            <p class="hero-kicker">LOS BUGS DELIVERY</p>
+        </header>
+        <section class="landing-body" style="text-align:center;">
+            <div id="pagoEmoji" style="font-size:3.4rem;margin-top:4px;">⏳</div>
+            <h1 id="pagoTitulo" class="view-title" style="margin:6px 0;font-size:1.6rem;">Verificando tu pago...</h1>
+            <p id="pagoTexto" class="lead" style="margin:6px 0 20px;">Danos un momento, estamos confirmando con Mercado Pago.</p>
+            <div id="pagoBotones"></div>
+            <p class="landing-foot">Pagos procesados por Mercado Pago.<br>© 2026 LOS BUGS DELIVERY</p>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            var q = new URLSearchParams(location.search);
+            var paymentId = q.get('payment_id') || q.get('collection_id');
+            var pedidoId = q.get('external_reference');
+            var statusMP = q.get('status') || q.get('collection_status');
+            var $ = function (id) { return document.getElementById(id); };
+            var intentos = 0;
+
+            function botones(html) { $('pagoBotones').innerHTML = html; }
+            var VER = '<a class="lbtn primary" href="/cliente.html#pedidos">Ver mi pedido</a><a class="lbtn" href="/cliente.html#inicio">Seguir pidiendo</a>';
+
+            function mostrar(estado) {
+                if (estado === 'aprobado') {
+                    $('pagoEmoji').textContent = '🎉';
+                    $('pagoTitulo').textContent = '¡Pago aprobado!';
+                    $('pagoTexto').textContent = 'Tu pedido' + (pedidoId ? ' #' + pedidoId : '') + ' está confirmado. Te enviamos un correo con el detalle y el comprobante de pago.';
+                    botones(VER);
+                } else if (estado === 'rechazado') {
+                    $('pagoEmoji').textContent = '😕';
+                    $('pagoTitulo').textContent = 'No se pudo procesar el pago';
+                    $('pagoTexto').textContent = 'Tu pedido quedó guardado, pero el pago no se completó. Puedes intentarlo otra vez con la misma u otra tarjeta.';
+                    botones((pedidoId ? '<button type="button" class="lbtn primary" id="btnReintentar">Reintentar pago</button>' : '') + '<a class="lbtn" href="/cliente.html#pedidos">Ver mis pedidos</a>');
+                    var b = $('btnReintentar');
+                    if (b) b.addEventListener('click', reintentar);
+                } else {
+                    $('pagoEmoji').textContent = '⏳';
+                    $('pagoTitulo').textContent = 'Estamos esperando la confirmación';
+                    $('pagoTexto').textContent = 'Mercado Pago aún no confirma tu pago. En cuanto lo haga te llegará un correo; también puedes revisarlo en "Pedidos".';
+                    botones('<a class="lbtn primary" href="/cliente.html#pedidos">Ver mis pedidos</a>');
+                }
+            }
+
+            function reintentar() {
+                var b = $('btnReintentar'); b.disabled = true; b.textContent = 'Abriendo Mercado Pago...';
+                fetch('/api/pagos/mercadopago', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pedido_id: Number(pedidoId) }) })
+                    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+                    .then(function (x) { if (x.ok && x.j.init_point) location.href = x.j.init_point; else { alert(x.j.error || 'No se pudo abrir Mercado Pago.'); b.disabled = false; b.textContent = 'Reintentar pago'; } })
+                    .catch(function () { alert('Sin conexión. Inténtalo de nuevo.'); b.disabled = false; b.textContent = 'Reintentar pago'; });
+            }
+
+            function consultar() {
+                intentos++;
+                var url = paymentId
+                    ? '/api/pagos/verificar?payment_id=' + encodeURIComponent(paymentId)
+                    : (pedidoId ? '/api/pedidos/' + encodeURIComponent(pedidoId) + '/pago' : null);
+                if (!url) { mostrar(statusMP === 'approved' ? 'aprobado' : 'pendiente'); return; }
+                fetch(url).then(function (r) { return r.json(); }).then(function (d) {
+                    var estado = d.estado || d.pago_estado;
+                    if (d.pedido_id && !pedidoId) pedidoId = String(d.pedido_id);
+                    if (estado === 'aprobado' || estado === 'rechazado') return mostrar(estado);
+                    if (statusMP === 'failure' || statusMP === 'rejected') return mostrar('rechazado');
+                    if (intentos < 8) setTimeout(consultar, 2500); else mostrar('pendiente');
+                }).catch(function () {
+                    if (intentos < 8) setTimeout(consultar, 2500); else mostrar('pendiente');
+                });
+            }
+            consultar();
+        })();
+    </script>
+</body>
+</html>

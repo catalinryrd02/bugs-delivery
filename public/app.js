@@ -249,6 +249,12 @@ async function realizarPedido() {
 
     const user = JSON.parse(localStorage.getItem('fb_user'));
     const total = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+    const metodo = document.getElementById('paymentMethod').value;
+
+    // El pago con tarjeta (Mercado Pago) necesita internet
+    if (metodo === 'Tarjeta' && !navigator.onLine) {
+        return alert('Para pagar con tarjeta necesitas conexión a internet. Puedes elegir efectivo o conectarte e intentar de nuevo.');
+    }
 
     const payload = {
         cliente_id: user.id,
@@ -256,20 +262,50 @@ async function realizarPedido() {
         lat_entrega: userCoords.lat,
         lng_entrega: userCoords.lng,
         total,
-        metodo_pago: document.getElementById('paymentMethod').value,
+        metodo_pago: metodo,
         items: carrito
     };
 
     try {
-        await fetch(`${API_URL}/pedidos`, {
+        const res = await fetch(`${API_URL}/pedidos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        alert('🎉 ¡Pedido confirmado! Un repartidor lo tomará en breve.');
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) return alert(data.error || 'No se pudo registrar el pedido.');
+
+        let mensaje = '🎉 ¡Pedido confirmado! Te enviamos un correo con el detalle y un repartidor lo tomará en breve.';
+        let irAPagar = null;
+
+        if (metodo === 'Tarjeta') {
+            if (data.pedidoId) {
+                // Crea el cobro en Mercado Pago y manda al cliente a pagar
+                try {
+                    const pago = await fetch(`${API_URL}/pagos/mercadopago`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pedido_id: data.pedidoId })
+                    });
+                    const info = await pago.json().catch(() => ({}));
+                    if (pago.ok && info.init_point) irAPagar = info.init_point;
+                    else mensaje = (info.error || 'No se pudo abrir Mercado Pago.') + ' Tu pedido quedó guardado: en "Pedidos" toca "Pagar ahora" para intentarlo otra vez.';
+                } catch {
+                    mensaje = 'No se pudo abrir Mercado Pago. Tu pedido quedó guardado: en "Pedidos" toca "Pagar ahora" para intentarlo otra vez.';
+                }
+            } else {
+                mensaje = 'Sin conexión estable: tu pedido se enviará en cuanto regrese internet. Después entra a "Pedidos" y toca "Pagar ahora".';
+            }
+        }
+
         carrito = [];
         localStorage.setItem('fb_cart', '[]');
         actualizarUIcarrito();
+        if (irAPagar) {
+            window.location.href = irAPagar; // sale a Mercado Pago
+            return;
+        }
+        alert(mensaje);
         toggleCart();
         cargarPedidosCliente();
     } catch {
@@ -280,7 +316,7 @@ async function realizarPedido() {
 async function cargarPedidosCliente() {
     const user = JSON.parse(localStorage.getItem('fb_user'));
     try {
-        const res = await fetch(`${API_URL}/pedidos`);
+        const res = await fetch(`${API_URL}/pedidos?cliente_id=${user.id}`);
         const pedidos = await res.json();
         const mios = pedidos.filter(p => p.cliente_id === user.id);
         document.getElementById('misPedidosTable').innerHTML = mios.map(p => `

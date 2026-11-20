@@ -10,7 +10,7 @@
   "lang": "es-MX",
   "dir": "ltr",
   "background_color": "#FFFFFF",
-  "theme_color": "#921733",
+  "theme_color": "#7B2857",
   "categories": ["food", "shopping"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
