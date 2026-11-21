@@ -3,7 +3,7 @@
    - API GET: red primero, caché como respaldo
    - Imágenes y mapas: caché con actualización
    Sube CACHE_VERSION cada vez que cambies archivos para forzar actualización. */
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const SHELL_CACHE = 'losbugs-shell-' + CACHE_VERSION;
 const API_CACHE = 'losbugs-api-' + CACHE_VERSION;
 const IMG_CACHE = 'losbugs-img-' + CACHE_VERSION;
