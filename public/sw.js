@@ -3,7 +3,7 @@
    - API GET: red primero, caché como respaldo
    - Imágenes y mapas: caché con actualización
    Sube CACHE_VERSION cada vez que cambies archivos para forzar actualización. */
-const CACHE_VERSION = 'v9';
+const CACHE_VERSION = 'v11';
 const SHELL_CACHE = 'losbugs-shell-' + CACHE_VERSION;
 const API_CACHE = 'losbugs-api-' + CACHE_VERSION;
 const IMG_CACHE = 'losbugs-img-' + CACHE_VERSION;
@@ -12,7 +12,7 @@ const CURRENT = [SHELL_CACHE, API_CACHE, IMG_CACHE, TILE_CACHE];
 
 const SHELL = [
   '/', '/index.html', '/cliente.html', '/admin.html', '/repartidor.html', '/offline.html',
-  '/styles.css', '/cliente.css', '/app.js', '/pwa.js', '/cliente-ui.js', '/staff.css', '/staff-ui.js', '/pago.html', '/manifest.json',
+  '/styles.css', '/cliente.css', '/app.js', '/pwa.js', '/cliente-ui.js', '/staff.css', '/staff-ui.js', '/motion.css', '/motion.js', '/landing.css', '/landing.js', '/pago.html', '/manifest.json',
   '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-192.png',
   '/icons/maskable-512.png', '/icons/apple-touch-icon.png', '/icons/favicon-48.png', '/icons/logo.png',
   '/img/bread.svg', '/img/burger.svg', '/img/burrito.svg', '/img/cake.svg', '/img/cheese.svg', '/img/chicken.svg', '/img/coffee.svg', '/img/donut.svg', '/img/drink.svg', '/img/fries.svg', '/img/hotdog.svg', '/img/icecream.svg', '/img/pancakes.svg', '/img/pasta.svg', '/img/pizza.svg', '/img/salad.svg', '/img/sandwich.svg', '/img/sushi.svg', '/img/tacos.svg'

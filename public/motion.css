@@ -1,0 +1,114 @@
+/* =========================================================
+   LOS BUGS · ANIMACIONES (estilo app moderna)
+   Se desactivan solas si el teléfono pide "reducir movimiento".
+   ========================================================= */
+:root { --ease: cubic-bezier(.22,1,.36,1); --spring: cubic-bezier(.34,1.56,.64,1); }
+
+/* ---- Aparición escalonada al hacer scroll ---- */
+.lb-rev { opacity: 0; transform: translateY(22px) scale(.97); }
+.lb-rev.lb-in { opacity: 1; transform: none; transition: opacity .55s var(--ease), transform .6s var(--ease); transition-delay: var(--d, 0ms); }
+
+/* ---- Portada con luz que se mueve ---- */
+.hero-home, .staff-hero, .profile-card { background-size: 180% 180% !important; animation: lbShift 9s ease-in-out infinite alternate; }
+@keyframes lbShift { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
+.hero-home::after, .staff-hero::after {
+    content: ""; position: absolute; inset: -40%; pointer-events: none;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.16), transparent 40%);
+    animation: lbGlow 7s ease-in-out infinite alternate;
+}
+@keyframes lbGlow { from { transform: translate(-8%, -6%); } to { transform: translate(14%, 10%); } }
+.hero-home h1, .staff-hero h1 { animation: lbRise .8s var(--ease) both; }
+.hero-hello { animation: lbRise .7s var(--ease) both; }
+.perks span, .stat-row > div { animation: lbRise .7s var(--ease) both; }
+.perks span:nth-child(2), .stat-row > div:nth-child(2) { animation-delay: .08s; }
+.perks span:nth-child(3), .stat-row > div:nth-child(3) { animation-delay: .16s; }
+.stat-row > div:nth-child(4) { animation-delay: .24s; }
+@keyframes lbRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---- Botones: respuesta al toque y ondas ---- */
+.btn, .chip, .pay-opt, .like-btn, .bn-item { -webkit-tap-highlight-color: transparent; }
+.btn { position: relative; overflow: hidden; transition: transform .18s var(--spring), box-shadow .25s ease, background .25s ease; }
+.btn:active, .chip:active, .pay-opt:active { transform: scale(.95); }
+.lb-ripple { position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,.55); transform: scale(0); animation: lbRipple .6s ease-out forwards; }
+.btn-soft .lb-ripple, .btn-outline .lb-ripple, .chip .lb-ripple { background: rgba(123,40,87,.25); }
+@keyframes lbRipple { to { transform: scale(3.2); opacity: 0; } }
+.chip { position: relative; overflow: hidden; transition: transform .18s var(--spring), background .25s ease, color .25s ease, box-shadow .25s ease; }
+
+/* ---- Tarjetas: levantan al pasar el dedo/mouse ---- */
+.card, .order-card, .prod-card, .person-card, .dash-card { transition: transform .35s var(--ease), box-shadow .35s var(--ease), opacity .3s ease; }
+@media (hover: hover) { .order-card:hover, .prod-card:hover, .person-card:hover, .dash-card:hover { transform: translateY(-4px); } }
+.card .card-img, .prod-img img { transition: transform .8s var(--ease); }
+.card:hover .card-img, .prod-card:hover .prod-img img { transform: scale(1.06); }
+
+/* ---- Corazón ---- */
+.like-btn.liked { animation: lbHeart .45s var(--spring); }
+@keyframes lbHeart { 0% { transform: scale(.6); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* ---- Menú inferior: el icono rebota al activarse ---- */
+.bn-item.active svg { animation: lbIcon .5s var(--spring); }
+@keyframes lbIcon { 0% { transform: scale(.6) rotate(-14deg); } 100% { transform: none; } }
+.bn-item.active { animation: lbPill .45s var(--spring); }
+@keyframes lbPill { 0% { transform: scaleX(.86); } 100% { transform: none; } }
+.bn-badge { animation: lbPop .4s var(--spring); }
+@keyframes lbPop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+.lb-bump { animation: lbBump .5s var(--spring); }
+@keyframes lbBump { 0% { transform: scale(1); } 35% { transform: scale(1.3) rotate(-8deg); } 100% { transform: scale(1); } }
+
+/* ---- Platillo que vuela al carrito ---- */
+.lb-fly {
+    position: fixed; z-index: 9999; width: 26px; height: 26px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 35% 30%, #F3ADC9, #D95B96 60%, #7B2857); box-shadow: 0 6px 16px rgba(123,40,87,.55);
+}
+
+/* ---- Cargando: esqueletos con brillo ---- */
+.lb-skel { border-radius: 24px; min-height: 270px; background: linear-gradient(100deg, rgba(255,255,255,.55) 30%, rgba(243,173,201,.45) 50%, rgba(255,255,255,.55) 70%) 0 0 / 220% 100%; animation: lbSkel 1.3s linear infinite; border: 1px solid rgba(255,255,255,.9); }
+@keyframes lbSkel { to { background-position: -220% 0; } }
+
+/* ---- Pantallas: entran deslizando ---- */
+body.page-cliente .view:not([hidden]), .page-staff .view:not([hidden]) { animation: lbView .45s var(--ease) both; }
+@keyframes lbView { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+.cart-drawer .cart-page { animation: none; }
+
+/* ---- Avance del pedido: se llena y la etapa actual late ---- */
+.step.done { animation: lbFill .7s var(--ease) both; }
+@keyframes lbFill { from { border-top-color: #FBE0EC; } }
+.step.current { position: relative; }
+.step.current::before { content: ""; position: absolute; left: 50%; top: -9px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #D95B96; box-shadow: 0 0 0 0 rgba(217,91,150,.7); animation: lbPulse 1.6s ease-out infinite; }
+@keyframes lbPulse { to { box-shadow: 0 0 0 14px rgba(217,91,150,0); } }
+.status-pill.status-en_camino { animation: lbBlink 1.8s ease-in-out infinite; }
+@keyframes lbBlink { 50% { box-shadow: 0 0 0 6px rgba(30,64,175,.12); } }
+
+/* ---- Gráficas del admin ---- */
+.bar i { transform-origin: bottom; animation: lbGrow .9s var(--ease) both; }
+.bar:nth-child(2) i { animation-delay: .05s; } .bar:nth-child(3) i { animation-delay: .1s; } .bar:nth-child(4) i { animation-delay: .15s; }
+.bar:nth-child(5) i { animation-delay: .2s; } .bar:nth-child(6) i { animation-delay: .25s; } .bar:nth-child(7) i { animation-delay: .3s; }
+@keyframes lbGrow { from { transform: scaleY(0); } }
+.meter i, .split i { animation: lbWide 1s var(--ease) both; transform-origin: left; }
+@keyframes lbWide { from { transform: scaleX(0); } }
+
+/* ---- Portada de entrada (index) ---- */
+.lb-float { animation: lbFloat 4.5s ease-in-out infinite; }
+@keyframes lbFloat { 50% { transform: translateY(-8px); } }
+.lbtn, .lb-stagger > * { animation: lbRise .6s var(--ease) both; }
+.lb-stagger > *:nth-child(2) { animation-delay: .07s; } .lb-stagger > *:nth-child(3) { animation-delay: .14s; }
+.lb-stagger > *:nth-child(4) { animation-delay: .21s; } .lb-stagger > *:nth-child(5) { animation-delay: .28s; }
+
+/* ---- Marcadores del mapa con latido ---- */
+.leaflet-interactive.lb-beat { animation: lbBeat 2.2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes lbBeat { 50% { transform: scale(1.25); } }
+.pin { animation: lbDrop .6s var(--spring) both; }
+@keyframes lbDrop { from { transform: translateY(-24px) scale(.5); opacity: 0; } }
+
+/* ---- Aviso (toast) ---- */
+.pwa-toast { transition: all .45s var(--spring) !important; }
+
+/* ---- Confeti ---- */
+.lb-confetti { position: fixed; top: -14px; z-index: 10000; width: 10px; height: 16px; border-radius: 3px; pointer-events: none; animation: lbFall var(--t, 2.6s) cubic-bezier(.2,.6,.3,1) forwards; }
+@keyframes lbFall { to { transform: translate3d(var(--x, 0), 105vh, 0) rotate(var(--r, 540deg)); opacity: .9; } }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    .lb-rev { opacity: 1; transform: none; }
+}
+
+.hero-home { position: relative; overflow: hidden; }

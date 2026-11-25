@@ -1,0 +1,103 @@
+/* =========================================================
+   PORTADA ANIMADA (index) · aurora, comida flotando, tarjeta de vidrio
+   ========================================================= */
+body.landing {
+    display: block; position: relative; overflow-x: hidden; padding: 0;
+    background: linear-gradient(160deg, #FFF3EA 0%, #FBE0EC 40%, #F3ADC9 100%);
+    background-attachment: fixed;
+}
+.landing-shell { position: relative; z-index: 2; min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; gap: 56px; padding: max(22px, env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
+
+/* ---- Aurora: manchas de color que se mueven ---- */
+.aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.aurora i { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .75; will-change: transform; }
+.aurora i:nth-child(1) { width: 52vmax; height: 52vmax; left: -14vmax; top: -16vmax; background: radial-gradient(circle, #D95B96, rgba(217,91,150,0) 68%); animation: auroraA 16s ease-in-out infinite alternate; }
+.aurora i:nth-child(2) { width: 48vmax; height: 48vmax; right: -16vmax; top: 18vh; background: radial-gradient(circle, #7B2857, rgba(123,40,87,0) 68%); opacity: .5; animation: auroraB 19s ease-in-out infinite alternate; }
+.aurora i:nth-child(3) { width: 44vmax; height: 44vmax; left: 20vw; bottom: -22vmax; background: radial-gradient(circle, #F3ADC9, rgba(243,173,201,0) 68%); animation: auroraC 22s ease-in-out infinite alternate; }
+@keyframes auroraA { to { transform: translate(14vmax, 10vmax) scale(1.15); } }
+@keyframes auroraB { to { transform: translate(-12vmax, -8vmax) scale(1.2); } }
+@keyframes auroraC { to { transform: translate(10vmax, -12vmax) scale(.9); } }
+
+/* ---- Comida flotando ---- */
+.floaters { position: fixed; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.floaters span { position: absolute; bottom: -12vh; left: var(--x); font-size: var(--s); opacity: 0; filter: drop-shadow(0 8px 10px rgba(61,16,49,.25)); animation: subir var(--t) linear var(--d) infinite; }
+@keyframes subir {
+    0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+    10% { opacity: .9; }
+    50% { transform: translate3d(var(--w), -58vh, 0) rotate(var(--r)); }
+    90% { opacity: .85; }
+    100% { transform: translate3d(calc(var(--w) * -1), -118vh, 0) rotate(calc(var(--r) * -1)); opacity: 0; }
+}
+
+/* ---- Lado de marca (escritorio) ---- */
+.brand-side { display: none; max-width: 520px; color: #270D20; }
+.bs-kicker { text-transform: uppercase; letter-spacing: .34em; font-size: .78rem; color: #7B2857; font-weight: 700; animation: bsIn .8s var(--ease, ease) both; }
+.bs-title { font-size: clamp(2.4rem, 4.6vw, 3.9rem); line-height: 1.06; font-weight: 800; letter-spacing: -.035em; margin: 14px 0 18px; animation: bsIn .9s var(--ease, ease) .1s both; }
+.bs-title em { font-style: normal; background: linear-gradient(90deg, #7B2857, #D95B96, #7B2857); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shineText 4s linear infinite; }
+.bs-word { color: #7B2857; border-bottom: 5px solid #D95B96; }
+.bs-caret { display: inline-block; width: 4px; height: .9em; margin-left: 4px; vertical-align: -.08em; background: #7B2857; animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+@keyframes shineText { to { background-position: -200% 0; } }
+.bs-text { font-size: 1.15rem; line-height: 1.55; color: #5C2A4B; max-width: 440px; animation: bsIn .9s var(--ease, ease) .2s both; }
+.bs-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.bs-chips span { background: rgba(255,255,255,.7); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid #fff; border-radius: 999px; padding: 10px 16px; font-weight: 700; font-size: .92rem; box-shadow: 0 10px 22px -10px rgba(123,40,87,.4); animation: bsIn .8s var(--ease, ease) both; }
+.bs-chips span:nth-child(1) { animation-delay: .35s; } .bs-chips span:nth-child(2) { animation-delay: .45s; } .bs-chips span:nth-child(3) { animation-delay: .55s; } .bs-chips span:nth-child(4) { animation-delay: .65s; }
+@keyframes bsIn { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@media (min-width: 940px) { .brand-side { display: block; } .landing-card { margin: 0; } }
+
+/* ---- Tarjeta ---- */
+.landing-card {
+    position: relative; width: 100%; max-width: 460px; flex: none;
+    background: rgba(255,255,255,.88); -webkit-backdrop-filter: blur(20px) saturate(1.3); backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid rgba(255,255,255,.9);
+    box-shadow: 0 40px 80px -24px rgba(61,16,49,.5), 0 2px 6px rgba(39,13,32,.08), inset 0 1px 0 #fff;
+    transform-style: preserve-3d; transition: transform .25s ease-out;
+    animation: cardIn 1s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(46px) scale(.94); } to { opacity: 1; transform: none; } }
+
+/* ---- Portada de la tarjeta ---- */
+.landing-card .hero { background-size: 180% 180%; animation: lbShift 9s ease-in-out infinite alternate; }
+.hero-logo { position: relative; animation: logoIn .9s cubic-bezier(.34,1.56,.64,1) .25s both, lbFloat 4.5s ease-in-out 1.2s infinite; }
+.hero-logo::before { content: ""; position: absolute; inset: -3px; border-radius: 31px; background: linear-gradient(135deg, #F3ADC9, #D95B96); z-index: -1; filter: blur(12px); opacity: .75; animation: glowPulse 2.4s ease-in-out infinite alternate; }
+@keyframes glowPulse { from { transform: scale(1); opacity: .45; } to { transform: scale(1.22); opacity: .9; } }
+.hero-logo::after { content: ""; position: absolute; inset: 0; border-radius: 28px; background: #fff; z-index: -1; }
+@keyframes logoIn { from { opacity: 0; transform: scale(.3) rotate(-40deg); } to { opacity: 1; transform: none; } }
+.hero-kicker { animation: bsIn .8s ease .15s both; }
+.hero h1 { white-space: nowrap; }
+.hero h1 .ch { display: inline-block; animation: chIn .7s cubic-bezier(.34,1.56,.64,1) both; animation-delay: calc(.5s + var(--i) * 60ms); }
+@keyframes chIn { from { opacity: 0; transform: translateY(26px) scale(.5) rotate(8deg); } to { opacity: 1; transform: none; } }
+.hero-sub { animation: subIn 1s ease .9s both; }
+@keyframes subIn { from { opacity: 0; letter-spacing: 1em; } to { opacity: 1; letter-spacing: .36em; } }
+.hero-line { animation: lineIn 1s ease 1s both; transform-origin: center; }
+@keyframes lineIn { from { transform: scaleX(0); } }
+.hero-tag { animation: bsIn .9s ease 1.1s both; }
+
+/* ---- Botones ---- */
+.landing-body .kicker, .landing-body .lead { animation: bsIn .7s ease .6s both; }
+#viewHome .lbtn { position: relative; overflow: hidden; opacity: 0; animation: btnIn .6s cubic-bezier(.22,1,.36,1) forwards; transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease; }
+#viewHome .lbtn:nth-of-type(1) { animation-delay: .75s; } #viewHome .lbtn:nth-of-type(2) { animation-delay: .85s; }
+#viewHome .lbtn:nth-of-type(3) { animation-delay: .95s; } #viewHome .lbtn:nth-of-type(4) { animation-delay: 1.05s; }
+#installBox .lbtn { animation-delay: 1.15s; }
+@keyframes btnIn { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
+.lbtn::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); transform: skewX(-20deg); pointer-events: none; }
+.lbtn:hover::after { animation: sweep .8s ease; }
+.lbtn.primary::after { animation: sweep 3.2s ease-in-out 2s infinite; }
+@keyframes sweep { to { left: 130%; } }
+.lbtn:hover { transform: translateY(-3px) scale(1.015); box-shadow: 0 14px 26px -10px rgba(123,40,87,.5); }
+.lbtn span:first-child { display: inline-block; transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+.lbtn:hover span:first-child { transform: scale(1.35) rotate(-10deg); }
+
+/* ---- Cambio de pantalla y formularios ---- */
+#viewLogin:not([hidden]), #viewRegister:not([hidden]), #viewHome:not([hidden]) { animation: viewSwap .5s cubic-bezier(.22,1,.36,1) both; }
+@keyframes viewSwap { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+#viewHome:not([hidden]) .lbtn { animation: btnIn .6s cubic-bezier(.22,1,.36,1) forwards; }
+.form-group input { transition: box-shadow .25s ease, border-color .25s ease, transform .25s ease; }
+.form-group input:focus { border-color: #D95B96; box-shadow: 0 0 0 4px rgba(217,91,150,.22); transform: translateY(-1px); outline: none; }
+.back-link { transition: transform .2s ease; } .back-link:hover { transform: translateX(-4px); }
+
+@media (max-width: 480px) { .landing-shell { padding-left: 12px; padding-right: 12px; } .hero h1 { font-size: 2.3rem; } }
+@media (prefers-reduced-motion: reduce) {
+    .aurora i, .floaters span, .hero-logo::before, .lbtn.primary::after { animation: none !important; }
+    #viewHome .lbtn { opacity: 1; }
+}

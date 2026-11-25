@@ -17,9 +17,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="motion.css">
+    <link rel="stylesheet" href="landing.css">
 </head>
 <body class="landing">
-    <main class="landing-card">
+    <!-- Fondo animado -->
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="floaters" id="floaters" aria-hidden="true"></div>
+
+    <div class="landing-shell">
+    <!-- Lado de marca (solo se ve en pantallas anchas) -->
+    <section class="brand-side" aria-hidden="true">
+        <p class="bs-kicker">Delivery de comida</p>
+        <h2 class="bs-title">Pide <span class="bs-word" id="bsWord">pizza</span><span class="bs-caret"></span><br>y la llevamos<br><em>hasta tu puerta.</em></h2>
+        <p class="bs-text">Restaurantes cerca de ti, pago seguro con Mercado Pago y seguimiento de tu pedido en tiempo real.</p>
+        <div class="bs-chips">
+            <span>🛵 Entrega rápida</span><span>💳 Pago seguro</span><span>📍 Seguimiento en vivo</span><span>📴 Funciona sin internet</span>
+        </div>
+    </section>
+    <main class="landing-card" id="tiltCard">
         <!-- PORTADA -->
         <header class="hero">
             <p class="hero-kicker">Delivery de comida</p>
@@ -97,6 +113,7 @@
             <p class="landing-foot">Tu comida, a tu puerta.<br>© 2026 LOS BUGS DELIVERY</p>
         </section>
     </main>
+    </div>
 
     <script src="app.js"></script>
     <script src="pwa.js"></script>
@@ -122,5 +139,7 @@
             });
         })();
     </script>
+    <script src="motion.js"></script>
+    <script src="landing.js"></script>
 </body>
 </html>
