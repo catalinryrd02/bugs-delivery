@@ -87,6 +87,7 @@
             const c = $('secCatalogo'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
         }
+        if (v === 'home' && favOn()) toggleFavoritosFilter();   // "Inicio" siempre muestra todo el menú
         setView(v);
     });
 
@@ -221,6 +222,31 @@
     let pedidos = [];
     const PASOS = [['pendiente', 'Recibido'], ['preparando', 'Preparando'], ['en_camino', 'En camino'], ['entregado', 'Entregado']];
 
+    // ------------------------------------------------------------
+    // Avisos en vivo: "va en camino" / "¡entregado!" sin tener que refrescar
+    // ------------------------------------------------------------
+    let ultimoEstado = null;
+    function notificar(msg) {
+        let el = document.getElementById('lbToast');
+        if (!el) { el = document.createElement('div'); el.id = 'lbToast'; el.className = 'pwa-toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+        el.textContent = msg; el.classList.add('show');
+        try { if (navigator.vibrate) navigator.vibrate([120, 60, 120]); } catch { /* sin vibración */ }
+        clearTimeout(notificar._t); notificar._t = setTimeout(() => el.classList.remove('show'), 5200);
+    }
+    function avisarCambios(nuevos) {
+        const mapa = {}; nuevos.forEach((p) => { mapa[p.id] = p.estado; });
+        if (ultimoEstado) {
+            nuevos.forEach((p) => {
+                const antes = ultimoEstado[p.id];
+                if (!antes || antes === p.estado) return;
+                if (p.estado === 'entregado') notificar('🎉 ¡Tu pedido #' + p.id + ' fue entregado! Buen provecho');
+                else if (p.estado === 'en_camino') notificar('🛵 Tu pedido #' + p.id + ' ya va en camino');
+                else if (p.estado === 'preparando') notificar('👨‍🍳 Están preparando tu pedido #' + p.id);
+            });
+        }
+        ultimoEstado = mapa;
+    }
+
     async function loadOrders() {
         const u = getUser();
         if (!u) return;
@@ -229,6 +255,7 @@
             if (!res.ok) return;
             const data = await res.json();
             if (!Array.isArray(data)) return;
+            avisarCambios(data);
             pedidos = data;
             renderOrders();
             fillStats();
@@ -298,8 +325,45 @@
     // Cuando app.js recarga su tabla (después de pedir), actualizamos las tarjetas
     let t1;
     new MutationObserver(() => { clearTimeout(t1); t1 = setTimeout(loadOrders, 400); }).observe($('misPedidosTable'), { childList: true });
-    setInterval(() => { if (current === 'pedidos' && navigator.onLine && !document.hidden) loadOrders(); }, 20000);
+    setInterval(() => { if (navigator.onLine && !document.hidden) loadOrders(); }, 8000);   // en vivo: se actualiza solo
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && navigator.onLine) loadOrders(); });
+    loadOrders();
     window.addEventListener('online', () => { if (current === 'pedidos' || current === 'perfil') loadOrders(); });
+
+
+    // ------------------------------------------------------------
+    // Corazón fluido: no vuelve a dibujar todo el catálogo (evita el salto y la pausa)
+    // ------------------------------------------------------------
+    (function () {
+        const base = window.toggleLike;
+        if (typeof base !== 'function') return;
+        window.toggleLike = function (id) {
+            const real = window.filtrarPorZona;
+            window.filtrarPorZona = function () {};          // evita el re-dibujado completo
+            try { base(id); } finally { window.filtrarPorZona = real; }
+            const on = Array.isArray(window.favoritos) ? window.favoritos.includes(id) : (typeof favoritos !== 'undefined' && favoritos.includes(id));
+            const btn = document.querySelector('.like-btn[onclick="toggleLike(' + id + ')"]');
+            if (btn) {
+                btn.classList.toggle('liked', on);
+                btn.textContent = on ? '❤️' : '🤍';
+                btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+            }
+            if (!on && favOn() && btn) {
+                const card = btn.closest('.card');
+                if (card) {
+                    card.classList.add('leaving');
+                    setTimeout(() => {
+                        card.remove();
+                        if (!document.querySelector('#productosGrid .card')) {
+                            const z = $('zoneSelector');
+                            if (typeof real === 'function') real(z ? z.value : 'Todas');   // muestra el mensaje de "sin favoritos"
+                        }
+                    }, 300);
+                }
+            }
+            syncNav();
+        };
+    })();
 
     // ------------------------------------------------------------
     // Perfil
@@ -307,7 +371,7 @@
     function fillStats() {
         const validos = pedidos.filter((p) => !(p.metodo_pago === 'Tarjeta' && p.pago_estado !== 'aprobado'));
         $('statPedidos').textContent = validos.length;
-        $('statGasto').textContent = '$' + validos.reduce((a, p) => a + Number(p.total || 0), 0).toFixed(0);
+        $('statEntregados').textContent = validos.filter((p) => p.estado === 'entregado').length;
         $('statFavs').textContent = (typeof favoritos !== 'undefined' ? favoritos.length : 0);
     }
     function fillProfile() {

@@ -3,7 +3,7 @@
    - API GET: red primero, caché como respaldo
    - Imágenes y mapas: caché con actualización
    Sube CACHE_VERSION cada vez que cambies archivos para forzar actualización. */
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v9';
 const SHELL_CACHE = 'losbugs-shell-' + CACHE_VERSION;
 const API_CACHE = 'losbugs-api-' + CACHE_VERSION;
 const IMG_CACHE = 'losbugs-img-' + CACHE_VERSION;
@@ -12,7 +12,7 @@ const CURRENT = [SHELL_CACHE, API_CACHE, IMG_CACHE, TILE_CACHE];
 
 const SHELL = [
   '/', '/index.html', '/cliente.html', '/admin.html', '/repartidor.html', '/offline.html',
-  '/styles.css', '/cliente.css', '/app.js', '/pwa.js', '/cliente-ui.js', '/pago.html', '/manifest.json',
+  '/styles.css', '/cliente.css', '/app.js', '/pwa.js', '/cliente-ui.js', '/staff.css', '/staff-ui.js', '/pago.html', '/manifest.json',
   '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-192.png',
   '/icons/maskable-512.png', '/icons/apple-touch-icon.png', '/icons/favicon-48.png', '/icons/logo.png',
   '/img/bread.svg', '/img/burger.svg', '/img/burrito.svg', '/img/cake.svg', '/img/cheese.svg', '/img/chicken.svg', '/img/coffee.svg', '/img/donut.svg', '/img/drink.svg', '/img/fries.svg', '/img/hotdog.svg', '/img/icecream.svg', '/img/pancakes.svg', '/img/pasta.svg', '/img/pizza.svg', '/img/salad.svg', '/img/sandwich.svg', '/img/sushi.svg', '/img/tacos.svg'
@@ -94,6 +94,9 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return; // POST/PUT/DELETE los maneja pwa.js (cola offline)
   const url = new URL(req.url);
+
+  // Rutas y direcciones (OSRM / Nominatim): siempre en vivo
+  if (url.hostname === 'router.project-osrm.org' || url.hostname === 'nominatim.openstreetmap.org') return;
 
   // Pagos: siempre directo a la red (nunca desde caché)
   if (url.origin === self.location.origin && (url.pathname.startsWith('/api/pagos/') || /^\/api\/pedidos\/\d+\/pago$/.test(url.pathname))) return;

@@ -14,10 +14,11 @@
     <meta name="apple-mobile-web-app-title" content="LOS BUGS">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="staff.css">
     <!-- Estilos de Leaflet (Mapa gratuito) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
-<body onload="initRepartidor()">
+<body class="page-staff page-repartidor view-pedidos" onload="initRepartidor()">
     <nav class="navbar">
         <a class="brand" href="#" aria-label="LOS BUGS DELIVERY">
             <img src="/icons/logo.png" alt="Logo LOS BUGS" width="44" height="44">
@@ -29,36 +30,53 @@
         </div>
     </nav>
 
-    <div class="container">
-        <div class="panel-section" id="secMapa">
-            <h2>🗺️ Mapa de Ruta de Entrega</h2>
-            <p style="color:var(--text-muted); margin-bottom:10px;">Selecciona un pedido abajo para visualizar la ubicación exacta de entrega en el mapa.</p>
-            <div id="driverMap" class="map-box"></div>
-        </div>
+    <main class="container">
+        <!-- ================= PEDIDOS ================= -->
+        <section id="secPedidos" class="view">
+            <header class="staff-hero">
+                <p class="hero-hello">Hola, <span id="heroName">repartidor</span> 🛵</p>
+                <h1>Tus entregas de hoy</h1>
+                <div class="stat-row">
+                    <div><strong id="stDisp">0</strong><span>Disponibles</span></div>
+                    <div><strong id="stRuta">0</strong><span>En camino</span></div>
+                    <div><strong id="stHechos">0</strong><span>Entregados</span></div>
+                </div>
+            </header>
+            <div class="chips" id="filtros" role="tablist" aria-label="Filtrar pedidos">
+                <button type="button" class="chip active" data-f="disp">Disponibles</button>
+                <button type="button" class="chip" data-f="ruta">En camino</button>
+                <button type="button" class="chip" data-f="hechos">Entregados</button>
+            </div>
+            <div id="ordersList" class="orders"></div>
+            <div class="empty-state" id="ordersEmpty" hidden>
+                <div class="empty-emoji">🛵</div>
+                <h3>No hay pedidos aquí</h3>
+                <p>Cuando entre uno nuevo aparecerá solo.</p>
+            </div>
+            <table class="legacy-table" aria-hidden="true"><tbody id="driverPedidosTable"></tbody></table>
+        </section>
 
-        <div class="panel-section" id="secPedidos">
-            <h2>📦 Pedidos Disponibles y Entregas Activas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th># Pedido</th>
-                        <th>Cliente y Teléfono</th>
-                        <th>Dirección de Entrega</th>
-                        <th>Total / Pago</th>
-                        <th>Estado</th>
-                        <th>Acciones de Entrega</th>
-                    </tr>
-                </thead>
-                <tbody id="driverPedidosTable"></tbody>
-            </table>
-        </div>
-    </div>
-
+        <!-- ================= RUTA ================= -->
+        <section id="secMapa" class="view" hidden>
+            <div class="route-map-wrap">
+                <div id="driverMap" class="map-box"></div>
+                <span class="map-chip" id="mapChip">🗺️ Elige un pedido para ver la ruta</span>
+            </div>
+            <div class="route-card" id="routeCard">
+                <div class="empty-inline" id="routeEmpty">
+                    <div class="empty-emoji">🧭</div>
+                    <p>Toca <b>Ver ruta</b> en un pedido y aquí verás el camino: primero al restaurante y después con el cliente.</p>
+                    <button type="button" class="btn btn-primary" data-view="pedidos">Ir a mis pedidos</button>
+                </div>
+                <div id="routeInfo" hidden></div>
+            </div>
+        </section>
+    </main>
 
     <!-- BARRA DE NAVEGACIÓN INFERIOR -->
-    <nav class="bottom-nav" id="bottomNav" aria-label="Navegación principal">
-        <button type="button" class="bn-item active" data-target="secMapa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span class="bn-label">Mapa</span></button>
-        <button type="button" class="bn-item" data-target="secPedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span class="bn-label">Pedidos</span></button>
+    <nav class="bottom-nav" id="bottomNav" data-managed="true" aria-label="Navegación principal">
+        <button type="button" class="bn-item active" data-view="pedidos" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg><span class="bn-label">Pedidos</span><span class="bn-badge" id="bnBadge" hidden>0</span></button>
+        <button type="button" class="bn-item" data-view="mapa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span class="bn-label">Ruta</span></button>
         <button type="button" class="bn-item" data-keep="true" onclick="logout()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg><span class="bn-label">Salir</span></button>
     </nav>
 
@@ -66,5 +84,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
     <script src="pwa.js"></script>
+    <script src="staff-ui.js"></script>
 </body>
 </html>
